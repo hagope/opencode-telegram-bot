@@ -6,6 +6,7 @@ export const ru: I18nDictionary = {
   "cmd.description.stop": "Прервать текущее действие",
   "cmd.description.detach": "Отсоединиться от текущей сессии",
   "cmd.description.sessions": "Список сессий",
+  "cmd.description.messages": "Сообщения текущей сессии",
   "cmd.description.tts": "Переключить аудиоответы",
   "cmd.description.projects": "Список проектов",
   "cmd.description.worktree": "Переключить git worktree",
@@ -163,6 +164,27 @@ export const ru: I18nDictionary = {
   "sessions.preview.title": "Последние сообщения:",
   "sessions.preview.you": "Вы:",
   "sessions.preview.agent": "Агент:",
+
+  "messages.project_not_selected":
+    "🏗 Проект не выбран.\n\nСначала выберите проект командой /projects.",
+  "messages.session_not_selected":
+    "💬 Сессия не выбрана.\n\nСначала выберите сессию через /sessions или создайте новую через /new.",
+  "messages.session_project_mismatch":
+    "⚠️ Выбранная сессия не соответствует текущему проекту. Повторно выберите сессию через /sessions.",
+  "messages.empty": "📭 В текущей сессии нет сообщений пользователя.",
+  "messages.select": "Выберите сообщение:",
+  "messages.select_page": "Выберите сообщение (страница {page}):",
+  "messages.fetch_error":
+    "🔴 OpenCode Server недоступен или произошла ошибка при получении списка сообщений.",
+  "messages.inactive_callback": "Это меню сообщений уже неактивно",
+  "messages.cancelled_callback": "Отменено",
+  "messages.page_empty_callback": "На этой странице нет сообщений",
+  "messages.button.prev_page": "⬅️ Назад",
+  "messages.button.next_page": "Вперёд ➡️",
+  "messages.button.revert": "↩️ Revert",
+  "messages.button.fork": "🔀 Fork",
+  "messages.button.back": "⬅️ Назад",
+  "messages.button.cancel": "❌ Отмена",
 
   "attach.project_not_selected":
     "🏗 Проект не выбран.\n\nСначала выберите проект командой /projects.",
