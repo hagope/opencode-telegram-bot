@@ -1,30 +1,13 @@
-import { CommandContext, Context } from "grammy";
 import { InlineKeyboard } from "grammy";
-import { getCurrentProject } from "../../settings/manager.js";
 import { getGitWorktreeContext } from "../../git/worktree.js";
-import { getProjects } from "../../project/manager.js";
-import { syncSessionDirectoryCache } from "../../session/cache-manager.js";
-
-import {
-  appendInlineMenuCancelButton,
-  ensureActiveInlineMenu,
-  replyWithInlineMenu,
-} from "../menus/inline-menu.js";
-import { switchToProject } from "../utils/switch-project.js";
-import { clearAllInteractionState } from "../../app/managers/interaction-manager.js";
-import { isForegroundBusy } from "../../app/services/run-control-service.js";
-import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
-import { logger } from "../../utils/logger.js";
 import { t } from "../../i18n/index.js";
+import { getCurrentProject } from "../../settings/manager.js";
+import { logger } from "../../utils/logger.js";
 import { config } from "../../config.js";
-import { ProjectInfo } from "../../settings/manager.js";
+import type { ProjectInfo } from "../../app/types/project.js";
 
 const MAX_INLINE_BUTTON_LABEL_LENGTH = 64;
-const PROJECT_PAGE_CALLBACK_PREFIX = "projects:page:";
-
-interface ProjectSelectDeps {
-  ensureEventSubscription?: (directory: string) => Promise<void>;
-}
+export const PROJECT_PAGE_CALLBACK_PREFIX = "projects:page:";
 
 interface ProjectsPaginationRange {
   page: number;
@@ -181,7 +164,7 @@ async function buildProjectsKeyboard(
   return keyboard;
 }
 
-async function buildProjectsMenuView(
+export async function buildProjectsMenuView(
   projects: ProjectInfo[],
   page: number,
 ): Promise<{ text: string; keyboard: InlineKeyboard }> {
@@ -198,121 +181,4 @@ async function buildProjectsMenuView(
     text: buildProjectsMenuText(currentProjectName, normalizedPage, totalPages),
     keyboard: await buildProjectsKeyboard(projects, normalizedPage),
   };
-}
-
-export async function projectsCommand(ctx: CommandContext<Context>) {
-  try {
-    if (isForegroundBusy()) {
-      await replyBusyBlocked(ctx);
-      return;
-    }
-
-    await syncSessionDirectoryCache();
-    const projects = await getProjects();
-
-    if (projects.length === 0) {
-      await ctx.reply(t("projects.empty"));
-      return;
-    }
-
-    const { text, keyboard } = await buildProjectsMenuView(projects, 0);
-
-    await replyWithInlineMenu(ctx, {
-      menuKind: "project",
-      text,
-      keyboard,
-    });
-  } catch (error) {
-    logger.error("[Bot] Error fetching projects:", error);
-    await ctx.reply(t("projects.fetch_error"));
-  }
-}
-
-export async function handleProjectSelect(
-  ctx: Context,
-  deps: ProjectSelectDeps = {},
-): Promise<boolean> {
-  const callbackQuery = ctx.callbackQuery;
-  if (!callbackQuery?.data) {
-    return false;
-  }
-
-  const page = parseProjectPageCallback(callbackQuery.data);
-  const isProjectSelection = callbackQuery.data.startsWith("project:");
-
-  if (page === null && !isProjectSelection) {
-    return false;
-  }
-
-  if (isForegroundBusy()) {
-    await replyBusyBlocked(ctx);
-    return true;
-  }
-
-  if (page !== null) {
-    const isActiveMenu = await ensureActiveInlineMenu(ctx, "project");
-    if (!isActiveMenu) {
-      return true;
-    }
-
-    try {
-      const projects = await getProjects();
-      if (projects.length === 0) {
-        await ctx.answerCallbackQuery();
-        await ctx.reply(t("projects.empty"));
-        return true;
-      }
-
-      const { text, keyboard } = await buildProjectsMenuView(projects, page);
-      await ctx.answerCallbackQuery();
-      await ctx.editMessageText(text, {
-        reply_markup: appendInlineMenuCancelButton(keyboard, "project"),
-      });
-    } catch (error) {
-      logger.error("[Bot] Error switching projects page:", error);
-      await ctx.answerCallbackQuery({ text: t("projects.page_load_error") });
-    }
-
-    return true;
-  }
-
-  const projectId = callbackQuery.data.replace("project:", "");
-
-  const isActiveMenu = await ensureActiveInlineMenu(ctx, "project");
-  if (!isActiveMenu) {
-    return true;
-  }
-
-  try {
-    const projects = await getProjects();
-    const selectedProject = projects.find((p) => p.id === projectId);
-
-    if (!selectedProject) {
-      throw new Error(`Project with id ${projectId} not found`);
-    }
-
-    const projectName = selectedProject.name || selectedProject.worktree;
-
-    logger.info(`[Bot] Project selected: ${projectName} (id: ${projectId})`);
-
-    const keyboard = deps.ensureEventSubscription
-      ? await switchToProject(ctx, selectedProject, "project_switched", {
-          ensureEventSubscription: deps.ensureEventSubscription,
-        })
-      : await switchToProject(ctx, selectedProject, "project_switched");
-
-    await ctx.answerCallbackQuery();
-    await ctx.reply(t("projects.selected", { project: projectName }), {
-      reply_markup: keyboard,
-    });
-
-    await ctx.deleteMessage();
-  } catch (error) {
-    clearAllInteractionState("project_select_error");
-    logger.error("[Bot] Error selecting project:", error);
-    await ctx.answerCallbackQuery();
-    await ctx.reply(t("projects.select_error"));
-  }
-
-  return true;
 }

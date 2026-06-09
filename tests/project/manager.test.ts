@@ -21,7 +21,7 @@ vi.mock("../../src/session/cache-manager.js", () => ({
   __resetSessionDirectoryCacheForTests: vi.fn(),
 }));
 
-import { getProjects, getProjectByWorktree } from "../../src/project/manager.js";
+import { getProjects, getProjectByWorktree } from "../../src/app/services/project-service.js";
 
 describe("project/manager", () => {
   let tempRoot = "";

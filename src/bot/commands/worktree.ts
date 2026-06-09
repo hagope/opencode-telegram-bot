@@ -2,7 +2,7 @@ import { CommandContext, Context, InlineKeyboard } from "grammy";
 import { config } from "../../config.js";
 import { getGitWorktreeContext, type GitWorktreeEntry } from "../../git/worktree.js";
 import { clearAllInteractionState } from "../../app/managers/interaction-manager.js";
-import { getProjectByWorktree } from "../../project/manager.js";
+import { getProjectByWorktree } from "../../app/services/project-service.js";
 import { upsertSessionDirectory } from "../../session/cache-manager.js";
 import { getCurrentProject } from "../../settings/manager.js";
 import { logger } from "../../utils/logger.js";
@@ -12,10 +12,13 @@ import {
   ensureActiveInlineMenu,
   replyWithInlineMenu,
 } from "../menus/inline-menu.js";
-import { switchToProject } from "../utils/switch-project.js";
+import { switchToProject } from "../../app/services/project-switch-service.js";
 import { isForegroundBusy } from "../../app/services/run-control-service.js";
 import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
-import { buildProjectButtonLabel, calculateProjectsPaginationRange } from "./projects.js";
+import {
+  buildProjectButtonLabel,
+  calculateProjectsPaginationRange,
+} from "../menus/project-selection-menu.js";
 
 const MAX_INLINE_BUTTON_LABEL_LENGTH = 64;
 const WORKTREE_CALLBACK_PREFIX = "worktree:";

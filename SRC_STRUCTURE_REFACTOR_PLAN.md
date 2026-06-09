@@ -410,7 +410,7 @@ src/bot/
   7. Обновить tests для open/ls/document/media-group/photo/file utils.
   8. Запустить files-related тесты, затем build.
 
-- [ ] **Этап 12. Projects**
+- [x] **Этап 12. Projects**
 
   1. Перенести `src/project/*` -> `app/services/project-service.ts` и `app/types/project.ts`.
   2. Перенести `bot/commands/projects.ts` -> `bot/commands/projects-command.ts`.

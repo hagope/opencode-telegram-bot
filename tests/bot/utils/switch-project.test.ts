@@ -67,7 +67,7 @@ vi.mock("../../../src/utils/logger.js", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-import { switchToProject } from "../../../src/bot/utils/switch-project.js";
+import { switchToProject } from "../../../src/app/services/project-switch-service.js";
 
 function createCtx(chatId: number = 123): Context {
   return {

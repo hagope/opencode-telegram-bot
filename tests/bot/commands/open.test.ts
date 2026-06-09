@@ -71,11 +71,11 @@ vi.mock("../../../src/session/cache-manager.js", () => ({
   syncSessionDirectoryCache: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("../../../src/project/manager.js", () => ({
+vi.mock("../../../src/app/services/project-service.js", () => ({
   getProjectByWorktree: mocked.getProjectByWorktreeMock,
 }));
 
-vi.mock("../../../src/bot/utils/switch-project.js", () => ({
+vi.mock("../../../src/app/services/project-switch-service.js", () => ({
   switchToProject: mocked.switchToProjectMock,
 }));
 

@@ -8,13 +8,13 @@ import {
 } from "../../app/services/file-browser-service.js";
 import { isForegroundBusy } from "../../app/services/run-control-service.js";
 import { t } from "../../i18n/index.js";
-import { getProjectByWorktree } from "../../project/manager.js";
+import { getProjectByWorktree } from "../../app/services/project-service.js";
 import { upsertSessionDirectory } from "../../session/cache-manager.js";
 import { logger } from "../../utils/logger.js";
 import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
 import { ensureActiveInlineMenu, clearActiveInlineMenu } from "../menus/inline-menu.js";
 import { sendDownloadedFile } from "../utils/send-downloaded-file.js";
-import { switchToProject } from "../utils/switch-project.js";
+import { switchToProject } from "../../app/services/project-switch-service.js";
 import {
   buildOpenRootsKeyboard,
   clearLsPathIndex,

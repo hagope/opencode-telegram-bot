@@ -1,9 +1,9 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { opencodeClient } from "../opencode/client.js";
-import { ProjectInfo } from "../settings/manager.js";
-import { getCachedSessionProjects } from "../session/cache-manager.js";
-import { logger } from "../utils/logger.js";
+import { opencodeClient } from "../../opencode/client.js";
+import { getCachedSessionProjects } from "../../session/cache-manager.js";
+import { logger } from "../../utils/logger.js";
+import type { ProjectInfo } from "../types/project.js";
 
 interface InternalProject extends ProjectInfo {
   lastUpdated: number;

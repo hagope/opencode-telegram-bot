@@ -22,7 +22,8 @@ import {
   sessionsCommand,
 } from "./commands/sessions.js";
 import { newCommand } from "./commands/new.js";
-import { projectsCommand, handleProjectSelect } from "./commands/projects.js";
+import { projectsCommand } from "./commands/projects-command.js";
+import { handleProjectSelect } from "./callbacks/project-callback-handler.js";
 import { worktreeCommand, handleWorktreeCallback } from "./commands/worktree.js";
 import { openCommand } from "./commands/open-command.js";
 import { lsCommand } from "./commands/ls-command.js";

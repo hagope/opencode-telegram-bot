@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "grammy";
-import { projectsCommand } from "../../../src/bot/commands/projects.js";
+import { projectsCommand } from "../../../src/bot/commands/projects-command.js";
 import { foregroundSessionState } from "../../../src/scheduled-task/foreground-state.js";
 import { t } from "../../../src/i18n/index.js";
 
@@ -17,7 +17,7 @@ vi.mock("../../../src/session/cache-manager.js", () => ({
   __resetSessionDirectoryCacheForTests: vi.fn(),
 }));
 
-vi.mock("../../../src/project/manager.js", () => ({
+vi.mock("../../../src/app/services/project-service.js", () => ({
   getProjects: mocked.getProjectsMock,
 }));
 

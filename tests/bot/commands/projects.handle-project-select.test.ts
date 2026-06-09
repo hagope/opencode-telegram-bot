@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "grammy";
 import { t } from "../../../src/i18n/index.js";
-import { handleProjectSelect } from "../../../src/bot/commands/projects.js";
+import { handleProjectSelect } from "../../../src/bot/callbacks/project-callback-handler.js";
 import { foregroundSessionState } from "../../../src/scheduled-task/foreground-state.js";
 
 const mocked = vi.hoisted(() => ({
@@ -10,7 +10,7 @@ const mocked = vi.hoisted(() => ({
   clearAllInteractionStateMock: vi.fn(),
 }));
 
-vi.mock("../../../src/project/manager.js", () => ({
+vi.mock("../../../src/app/services/project-service.js", () => ({
   getProjects: mocked.getProjectsMock,
 }));
 

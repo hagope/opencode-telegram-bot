@@ -1,34 +1,21 @@
 import type { Context } from "grammy";
-import type { ProjectInfo } from "../../settings/manager.js";
+import type { ProjectInfo } from "../types/project.js";
 import { setCurrentProject } from "../../settings/manager.js";
 import { clearSession } from "../../session/manager.js";
 import { summaryAggregator } from "../../summary/aggregator.js";
-import { pinnedMessageManager } from "../pinned/pinned-message-manager.js";
-import { keyboardManager } from "../keyboards/keyboard-manager.js";
+import { pinnedMessageManager } from "../../bot/pinned/pinned-message-manager.js";
+import { keyboardManager } from "../../bot/keyboards/keyboard-manager.js";
 import { detachAttachedSession } from "../../attach/service.js";
 import { stopEventListening } from "../../opencode/events.js";
 import { backgroundSessionTracker } from "../../background-session/tracker.js";
-import { getStoredAgent, resolveProjectAgent } from "../../app/services/agent-selection-service.js";
-import { getStoredModel } from "../../app/services/model-selection-service.js";
-import { formatVariantForButton } from "../../app/services/variant-selection-service.js";
-import { clearAllInteractionState } from "../../app/managers/interaction-manager.js";
-import { createMainKeyboard } from "../keyboards/main-reply-keyboard.js";
+import { getStoredAgent, resolveProjectAgent } from "./agent-selection-service.js";
+import { getStoredModel } from "./model-selection-service.js";
+import { formatVariantForButton } from "./variant-selection-service.js";
+import { clearAllInteractionState } from "../managers/interaction-manager.js";
+import { createMainKeyboard } from "../../bot/keyboards/main-reply-keyboard.js";
 import { logger } from "../../utils/logger.js";
 import { config } from "../../config.js";
 
-/**
- * Shared logic for switching the active project.
- *
- * Called by both `/projects` (selecting an existing project) and `/open`
- * (browsing and adding a new directory). Performs the full state transition:
- * persists the project, clears the session, resets the pinned message and
- * keyboard, and returns a fresh reply keyboard for the caller to attach to
- * its confirmation message.
- *
- * @param ctx       grammY callback context (used for `ctx.chat` / `ctx.api`)
- * @param project   the project to switch to
- * @param reason    short tag for `clearAllInteractionState` (e.g. "project_switched")
- */
 interface SwitchToProjectOptions {
   ensureEventSubscription?: (directory: string) => Promise<void>;
 }
