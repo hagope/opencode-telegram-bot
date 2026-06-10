@@ -13,8 +13,9 @@ import { upsertSessionDirectory } from "../../app/services/session-cache-service
 import { logger } from "../../utils/logger.js";
 import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
 import { ensureActiveInlineMenu, clearActiveInlineMenu } from "../menus/inline-menu.js";
-import { sendDownloadedFile } from "../utils/send-downloaded-file.js";
+import { sendDownloadedFile } from "../render/send-downloaded-file.js";
 import { switchToProject } from "../../app/services/project-switch-service.js";
+import { createProjectSwitchPresentation } from "../services/project-switch-presentation.js";
 import {
   buildOpenRootsKeyboard,
   clearLsPathIndex,
@@ -162,11 +163,10 @@ async function selectDirectory(
 
     const projectInfo = await getProjectByWorktree(directory);
     const selectedProjectInfo = { ...projectInfo, name: displayPath };
-    const replyKeyboard = deps.ensureEventSubscription
-      ? await switchToProject(ctx, selectedProjectInfo, "open_project_selected", {
-          ensureEventSubscription: deps.ensureEventSubscription,
-        })
-      : await switchToProject(ctx, selectedProjectInfo, "open_project_selected");
+    const replyKeyboard = await switchToProject(ctx, selectedProjectInfo, "open_project_selected", {
+      ensureEventSubscription: deps.ensureEventSubscription,
+      presentation: createProjectSwitchPresentation(),
+    });
 
     await ctx.answerCallbackQuery();
     await ctx.reply(t("open.selected", { project: displayPath }), { reply_markup: replyKeyboard });

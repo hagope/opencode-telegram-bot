@@ -9,13 +9,15 @@ import {
   setPinnedMessageId,
   clearPinnedMessageId,
 } from "../../app/stores/settings-store.js";
-import { getModelContextLimit } from "../../app/services/model-context-limit-service.js";
+import {
+  DEFAULT_CONTEXT_LIMIT,
+  getModelContextLimit,
+} from "../../app/services/model-context-limit-service.js";
 import { getStoredModel } from "../../app/services/model-selection-service.js";
 import { isExpectedOpencodeUnavailableError } from "../../utils/opencode-error.js";
 import type { FileChange, PinnedMessageState, TokensInfo } from "./pinned-message-types.js";
 import { t } from "../../i18n/index.js";
 import {
-  DEFAULT_CONTEXT_LIMIT,
   formatContextLine,
   formatCostLine,
   formatModelDisplayName,

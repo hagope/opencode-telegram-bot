@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 
 import { cleanupBotRuntime, createBot } from "../../bot/index.js";
+import { createScheduledTaskDeliverySender } from "../../bot/render/scheduled-task-delivery.js";
 import { config } from "../../config.js";
 import { opencodeAutoRestartService } from "../../opencode/auto-restart.js";
 import {
@@ -53,7 +54,10 @@ export async function startBotApp(): Promise<void> {
   await reconcileStoredModelSelection();
   registerOpenCodeReadyRefreshHandler();
   const bot = createBot();
-  await scheduledTaskRuntime.initialize(bot);
+  await scheduledTaskRuntime.initialize(
+    bot,
+    createScheduledTaskDeliverySender(bot.api, config.telegram.allowedUserId),
+  );
   safeBackgroundTask({
     taskName: "app.opencodeStartup",
     task: async () => {

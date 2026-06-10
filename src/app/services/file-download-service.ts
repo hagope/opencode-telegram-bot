@@ -22,7 +22,7 @@ function telegramFileUrlBase(): string {
   return `${apiRoot}/file/bot`;
 }
 
-function buildTelegramFileUrl(filePath: string): string {
+export function buildTelegramFileUrl(filePath: string): string {
   return `${telegramFileUrlBase()}${config.telegram.token}/${filePath}`;
 }
 

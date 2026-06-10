@@ -20,7 +20,7 @@ import {
   setPromptResponseModeClearerForReconciliation,
   setResponseStreamerForReconciliation,
 } from "../../app/services/busy-reconciliation-service.js";
-import { finalizeAssistantResponse } from "../core/assistant-execution/finalize-assistant-response.js";
+import { finalizeAssistantResponse } from "../streaming/finalize-assistant-response.js";
 import { sendTtsResponseForSession } from "../handlers/tts-response-handler.js";
 import { deliverThinkingMessage } from "../render/thinking-message.js";
 import { shouldSuppressUserAbortSessionError } from "../../app/managers/abort-suppression-manager.js";
@@ -49,7 +49,7 @@ import {
   prepareAssistantStreamingPayload,
   renderAssistantFinalPartsSafe,
 } from "../render/assistant-rendering.js";
-import { deliverExternalUserInputNotification } from "../../app/services/external-user-input-service.js";
+import { deliverExternalUserInputNotification } from "../render/external-user-input-notification.js";
 import {
   backgroundSessionTracker,
   type BackgroundSessionNotification,

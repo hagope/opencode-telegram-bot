@@ -1,7 +1,5 @@
 import { t } from "../../i18n/index.js";
 
-export const DEFAULT_CONTEXT_LIMIT = 200000;
-
 export function formatTokenCount(count: number): string {
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)}M`;

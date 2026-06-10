@@ -16,6 +16,7 @@ import {
   WORKTREE_CALLBACK_PREFIX,
 } from "../menus/worktree-selection-menu.js";
 import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
+import { createProjectSwitchPresentation } from "../services/project-switch-presentation.js";
 
 interface WorktreeCallbackDeps {
   ensureEventSubscription?: (directory: string) => Promise<void>;
@@ -104,11 +105,10 @@ export async function handleWorktreeCallback(
     await upsertSessionDirectory(selectedWorktree.path, Date.now());
     const projectInfo = await getProjectByWorktree(selectedWorktree.path);
     const selectedProjectInfo = { ...projectInfo, name: selectedWorktree.path };
-    const replyKeyboard = deps.ensureEventSubscription
-      ? await switchToProject(ctx, selectedProjectInfo, "worktree_switched", {
-          ensureEventSubscription: deps.ensureEventSubscription,
-        })
-      : await switchToProject(ctx, selectedProjectInfo, "worktree_switched");
+    const replyKeyboard = await switchToProject(ctx, selectedProjectInfo, "worktree_switched", {
+      ensureEventSubscription: deps.ensureEventSubscription,
+      presentation: createProjectSwitchPresentation(),
+    });
 
     await ctx.answerCallbackQuery();
     await ctx.reply(t("worktree.selected", { worktree: selectedWorktree.path }), {

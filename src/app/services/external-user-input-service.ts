@@ -1,24 +1,15 @@
-import type { Api, RawApi } from "grammy";
 import { t } from "../../i18n/index.js";
-import { escapePlainTextForTelegramMarkdownV2 } from "../../bot/render/summary-message-formatter.js";
-import { sendBotText } from "../../bot/render/telegram-text.js";
-
-type SendMessageApi = Pick<Api<RawApi>, "sendMessage">;
 
 const EXTERNAL_USER_INPUT_MAX_DISPLAY_LENGTH = 2000;
+const MARKDOWN_V2_RESERVED_CHARS = /([_\*\[\]\(\)~`>#+\-=|{}.!\\])/g;
 
-interface ExternalUserInputNotification {
+export interface ExternalUserInputNotification {
   text: string;
   rawFallbackText: string;
 }
 
-interface DeliverExternalUserInputParams {
-  api: SendMessageApi;
-  chatId: number;
-  currentSessionId: string | null;
-  sessionId: string;
-  text: string;
-  consumeSuppressedInput: (sessionId: string, text: string) => boolean;
+function escapePlainTextForTelegramMarkdownV2(text: string): string {
+  return text.replace(MARKDOWN_V2_RESERVED_CHARS, "\\$1");
 }
 
 function normalizeExternalUserInputText(text: string): string {
@@ -61,32 +52,4 @@ export function buildExternalUserInputNotification(text: string): ExternalUserIn
     text: `${escapePlainTextForTelegramMarkdownV2(title)}\n\n${buildQuotedMarkdownText(displayText)}`,
     rawFallbackText: `${title}\n\n${buildQuotedPlainText(displayText)}`,
   };
-}
-
-export async function deliverExternalUserInputNotification({
-  api,
-  chatId,
-  currentSessionId,
-  sessionId,
-  text,
-  consumeSuppressedInput,
-}: DeliverExternalUserInputParams): Promise<boolean> {
-  const notification = buildExternalUserInputNotification(text);
-  if (!notification || currentSessionId !== sessionId) {
-    return false;
-  }
-
-  if (consumeSuppressedInput(sessionId, text)) {
-    return false;
-  }
-
-  await sendBotText({
-    api,
-    chatId,
-    text: notification.text,
-    rawFallbackText: notification.rawFallbackText,
-    format: "markdown_v2",
-  });
-
-  return true;
 }

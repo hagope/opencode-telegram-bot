@@ -1,13 +1,8 @@
 import type { Bot, Context } from "grammy";
 import { config } from "../../config.js";
-import {
-  escapePlainTextForTelegramMarkdownV2,
-  formatSummaryWithMode,
-} from "../../bot/render/summary-message-formatter.js";
 import { t } from "../../i18n/index.js";
 import { logger } from "../../utils/logger.js";
 import { safeBackgroundTask } from "../../utils/safe-background-task.js";
-import { sendBotText } from "../../bot/render/telegram-text.js";
 import { formatAssistantRunFooter } from "../formatters/assistant-run-footer-formatter.js";
 import { executeScheduledTask, SCHEDULED_TASK_AGENT } from "./scheduled-task-executor-service.js";
 import { foregroundSessionState } from "../managers/foreground-session-state-manager.js";
@@ -23,38 +18,11 @@ import {
 import type { QueuedScheduledTaskDelivery, ScheduledTask } from "../types/scheduled-task.js";
 
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
-const TELEGRAM_MESSAGE_LIMIT = 4096;
 const TASK_DESCRIPTION_PREVIEW_LENGTH = 64;
 const RESTART_INTERRUPTED_ERROR = "Interrupted by bot restart during scheduled task execution.";
 
-function getScheduledTaskDeliveryFormat(): "raw" | "markdown_v2" {
-  return config.bot.messageFormatMode === "markdown" ? "markdown_v2" : "raw";
-}
-
-function buildScheduledTaskSuccessMessageParts(delivery: QueuedScheduledTaskDelivery): string[] {
-  if (!delivery.resultText) {
-    return [delivery.notificationText];
-  }
-
-  if (config.bot.messageFormatMode !== "markdown") {
-    return formatSummaryWithMode(
-      `${delivery.notificationText}\n\n${delivery.resultText}`,
-      config.bot.messageFormatMode,
-    );
-  }
-
-  const header = escapePlainTextForTelegramMarkdownV2(delivery.notificationText);
-  const resultParts = formatSummaryWithMode(delivery.resultText, config.bot.messageFormatMode);
-  if (resultParts.length === 0) {
-    return [header];
-  }
-
-  const firstPart = `${header}\n\n${resultParts[0]}`;
-  if (firstPart.length <= TELEGRAM_MESSAGE_LIMIT) {
-    return [firstPart, ...resultParts.slice(1)];
-  }
-
-  return [header, ...resultParts];
+export interface ScheduledTaskDeliverySender {
+  send(delivery: QueuedScheduledTaskDelivery): Promise<boolean>;
 }
 
 function normalizeTaskPrompt(prompt: string): string {
@@ -123,15 +91,17 @@ function buildErrorDelivery(
 export class ScheduledTaskRuntime {
   private botApi: Bot<Context>["api"] | null = null;
   private chatId: number | null = null;
+  private deliverySender: ScheduledTaskDeliverySender | null = null;
   private initialized = false;
   private timersByTaskId = new Map<string, ReturnType<typeof setTimeout>>();
   private runningTaskIds = new Set<string>();
   private deliveryQueue: QueuedScheduledTaskDelivery[] = [];
   private flushInProgress = false;
 
-  async initialize(bot: Bot<Context>): Promise<void> {
+  async initialize(bot: Bot<Context>, deliverySender?: ScheduledTaskDeliverySender): Promise<void> {
     this.botApi = bot.api;
     this.chatId = config.telegram.allowedUserId;
+    this.deliverySender = deliverySender ?? null;
 
     if (this.initialized) {
       return;
@@ -207,6 +177,7 @@ export class ScheduledTaskRuntime {
 
     this.botApi = null;
     this.chatId = null;
+    this.deliverySender = null;
     this.initialized = false;
     this.timersByTaskId.clear();
     this.runningTaskIds.clear();
@@ -489,31 +460,11 @@ export class ScheduledTaskRuntime {
     }
 
     try {
-      const messageParts =
-        delivery.status === "success"
-          ? buildScheduledTaskSuccessMessageParts(delivery)
-          : [delivery.notificationText];
-      const format = delivery.status === "success" ? getScheduledTaskDeliveryFormat() : "raw";
-      const suppressResultNotification = delivery.status === "success" && Boolean(delivery.footerText);
-
-      for (const part of messageParts) {
-        await sendBotText({
-          api: this.botApi,
-          chatId: this.chatId,
-          text: part,
-          format,
-          ...(suppressResultNotification ? { options: { disable_notification: true } } : {}),
-        });
+      if (this.deliverySender) {
+        return await this.deliverySender.send(delivery);
       }
 
-      if (delivery.status === "success" && delivery.footerText) {
-        await sendBotText({
-          api: this.botApi,
-          chatId: this.chatId,
-          text: delivery.footerText,
-          format: "raw",
-        });
-      }
+      await this.botApi.sendMessage(this.chatId, delivery.notificationText);
 
       return true;
     } catch (error) {

@@ -317,6 +317,7 @@ describe("open command", () => {
         ctx,
         expect.objectContaining({ id: "proj-1", worktree: "/home/user/my-project" }),
         "open_project_selected",
+        expect.objectContaining({ presentation: expect.any(Object) }),
       );
       const upsertOrder = mocked.upsertSessionDirectoryMock.mock.invocationCallOrder[0];
       const getProjectOrder = mocked.getProjectByWorktreeMock.mock.invocationCallOrder[0];

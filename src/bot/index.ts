@@ -3,7 +3,10 @@ import { config } from "../config.js";
 import { getCurrentProject } from "../app/stores/settings-store.js";
 import { attachManager } from "../app/managers/attach-manager.js";
 import { clearAllInteractionState } from "../app/managers/interaction-manager.js";
-import { restoreAttachedCurrentSession } from "../app/services/attach-service.js";
+import {
+  configureAttachPresentation,
+  restoreAttachedCurrentSession,
+} from "../app/services/attach-service.js";
 import { opencodeReadyLifecycle } from "../opencode/ready-lifecycle.js";
 import { logger } from "../utils/logger.js";
 import { safeBackgroundTask } from "../utils/safe-background-task.js";
@@ -20,6 +23,7 @@ import {
   createEventSubscriptionService,
   type BotEventSubscriptionService,
 } from "./services/event-subscription-service.js";
+import { createAttachPresentation } from "./services/attach-presentation.js";
 import { createTelegramBotOptions } from "./telegram-client-options.js";
 
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
@@ -39,6 +43,8 @@ export function createBot(): Bot<Context> {
 
   const botOptions = createTelegramBotOptions(config.telegram);
   const bot = new Bot(config.telegram.token, botOptions);
+
+  configureAttachPresentation(createAttachPresentation());
 
   eventSubscriptionService.setTelegramContext(bot, config.telegram.allowedUserId);
 

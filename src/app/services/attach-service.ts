@@ -2,12 +2,9 @@ import type { Bot, Context } from "grammy";
 import { opencodeClient } from "../../opencode/client.js";
 import { isOpencodeServerHealthy } from "../../opencode/ready-refresh.js";
 import { summaryAggregator } from "../managers/summary-aggregation-manager.js";
-import { pinnedMessageManager } from "../../bot/pinned/pinned-message-manager.js";
-import { keyboardManager } from "../../bot/keyboards/keyboard-manager.js";
 import { questionManager } from "../managers/question-manager.js";
 import { permissionManager } from "../managers/permission-manager.js";
-import { showCurrentQuestion } from "../../bot/menus/question-menu.js";
-import { showPermissionRequest } from "../../bot/menus/permission-menu.js";
+import type { PermissionRequest } from "../types/permission.js";
 import type { SessionInfo } from "../types/session.js";
 import { getCurrentSession } from "./session-service.js";
 import { getCurrentProject } from "../stores/settings-store.js";
@@ -16,10 +13,27 @@ import { logger } from "../../utils/logger.js";
 import { isExpectedOpencodeUnavailableError } from "../../utils/opencode-error.js";
 
 interface EnsureAttachPinnedSessionParams {
-  api: Context["api"];
+  api: Bot<Context>["api"];
   chatId: number;
   session: SessionInfo;
   forceFullRestore?: boolean;
+}
+
+export interface AttachPresentationDeps {
+  ensurePinnedSession(params: EnsureAttachPinnedSessionParams): Promise<void>;
+  syncAttachState(attached: boolean, busy: boolean): Promise<void>;
+  showCurrentQuestion(api: Bot<Context>["api"], chatId: number): Promise<void>;
+  showPermissionRequest(
+    api: Bot<Context>["api"],
+    chatId: number,
+    request: PermissionRequest,
+  ): Promise<void>;
+}
+
+let attachPresentation: AttachPresentationDeps | null = null;
+
+export function configureAttachPresentation(deps: AttachPresentationDeps | null): void {
+  attachPresentation = deps;
 }
 
 export interface AttachSessionDeps {
@@ -53,47 +67,13 @@ function getAttachBusyStatus(sessionId: string, statuses: unknown): boolean {
   return sessionStatus?.type === "busy";
 }
 
-async function ensureAttachPinnedSession({
-  api,
-  chatId,
-  session,
-  forceFullRestore = false,
-}: EnsureAttachPinnedSessionParams): Promise<void> {
-  if (!pinnedMessageManager.isInitialized()) {
-    pinnedMessageManager.initialize(api, chatId);
-  }
-
-  keyboardManager.initialize(api, chatId);
-
-  const pinnedState = pinnedMessageManager.getState();
-  if (pinnedState.sessionId === session.id && pinnedState.messageId) {
-    if (forceFullRestore) {
-      await pinnedMessageManager.loadContextFromHistory(session.id, session.directory);
-    }
-    return;
-  }
-
-  if (pinnedState.messageId && pinnedState.sessionId === null) {
-    await pinnedMessageManager.restoreExistingSession(session.id, session.title);
-  } else {
-    await pinnedMessageManager.onSessionChange(session.id, session.title);
-  }
-
-  await pinnedMessageManager.loadContextFromHistory(session.id, session.directory);
-
-  const contextInfo = pinnedMessageManager.getContextInfo();
-  if (contextInfo) {
-    keyboardManager.updateContext(contextInfo.tokensUsed, contextInfo.tokensLimit);
-  }
-}
-
 async function syncPinnedAttachState(): Promise<void> {
-  if (!pinnedMessageManager.isInitialized()) {
+  if (!attachPresentation) {
     return;
   }
 
   const attached = attachManager.getSnapshot();
-  await pinnedMessageManager.setAttachState(attached !== null, attached?.busy ?? false);
+  await attachPresentation.syncAttachState(attached !== null, attached?.busy ?? false);
 }
 
 async function restorePendingQuestion(
@@ -116,12 +96,12 @@ async function restorePendingQuestion(
   }
 
   const pendingQuestion = data.find((request) => request.sessionID === sessionId);
-  if (!pendingQuestion) {
+  if (!pendingQuestion || !attachPresentation) {
     return false;
   }
 
   questionManager.startQuestions(pendingQuestion.questions, pendingQuestion.id);
-  await showCurrentQuestion(bot.api, chatId);
+  await attachPresentation.showCurrentQuestion(bot.api, chatId);
   return true;
 }
 
@@ -145,8 +125,12 @@ async function restorePendingPermissions(
   }
 
   const pendingPermissions = data.filter((request) => request.sessionID === sessionId);
+  if (!attachPresentation) {
+    return 0;
+  }
+
   for (const request of pendingPermissions) {
-    await showPermissionRequest(bot.api, chatId, request);
+    await attachPresentation.showPermissionRequest(bot.api, chatId, request);
   }
 
   return pendingPermissions.length;
@@ -156,7 +140,7 @@ export async function attachToSession(deps: AttachSessionDeps): Promise<AttachSe
   const { bot, chatId, session, ensureEventSubscription, forceFullRestore = false } = deps;
   const alreadyAttached = attachManager.isAttachedSession(session.id, session.directory);
 
-  await ensureAttachPinnedSession({
+  await attachPresentation?.ensurePinnedSession({
     api: bot.api,
     chatId,
     session,

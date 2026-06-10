@@ -521,7 +521,7 @@ src/bot/
   6. Убедиться, что `bot/index.ts` является composition root, а не местом бизнес-логики.
   7. Запустить полный `npm run build`, `npm run lint`, `npm test`.
 
-- [ ] **Этап 24. Финальная чистка структуры**
+- [x] **Этап 24. Финальная чистка структуры**
 
   1. Удалить пустые старые директории: `model`, `agent`, `variant`, `session`, `project`, `git`, `scheduled-task`, `settings`, `attach`, `background-session`, `external-input`, `stt`, `tts`, `summary`, если они полностью перенесены.
   2. Убедиться, что в `app/services`, `app/managers`, `app/stores` нет generic файлов `manager.ts`, `service.ts`, `types.ts`.

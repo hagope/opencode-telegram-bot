@@ -50,7 +50,7 @@ vi.mock("../../../src/app/managers/interaction-manager.js", () => ({
   },
 }));
 
-vi.mock("../../../src/bot/utils/send-downloaded-file.js", () => ({
+vi.mock("../../../src/bot/render/send-downloaded-file.js", () => ({
   sendDownloadedFile: mocked.sendDownloadedFileMock,
 }));
 

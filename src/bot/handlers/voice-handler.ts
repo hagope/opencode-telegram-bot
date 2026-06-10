@@ -10,7 +10,7 @@ import { isSttConfigured, transcribeAudio, type SttResult } from "../../app/serv
 import { processUserPrompt, type ProcessPromptDeps } from "./prompt.js";
 import { logger } from "../../utils/logger.js";
 import { t } from "../../i18n/index.js";
-import { buildTelegramFileUrl } from "../utils/telegram-file-url.js";
+import { buildTelegramFileUrl } from "../../app/services/file-download-service.js";
 
 const TELEGRAM_DOWNLOAD_TIMEOUT_MS = 30_000;
 const TELEGRAM_DOWNLOAD_MAX_REDIRECTS = 3;

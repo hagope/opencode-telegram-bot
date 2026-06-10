@@ -171,6 +171,7 @@ describe("bot/commands/worktree", () => {
       ctx,
       expect.objectContaining({ worktree: "/repo-feature" }),
       "worktree_switched",
+      expect.objectContaining({ presentation: expect.any(Object) }),
     );
     expect(ctx.reply).toHaveBeenCalledWith(t("worktree.selected", { worktree: "/repo-feature" }), {
       reply_markup: { inline_keyboard: [] },
