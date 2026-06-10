@@ -18,7 +18,7 @@ vi.mock("../../../../src/utils/logger.js", () => ({
   },
 }));
 
-import { attachManager } from "../../../../src/attach/manager.js";
+import { attachManager } from "../../../../src/app/managers/attach-manager.js";
 import { foregroundSessionState } from "../../../../src/scheduled-task/foreground-state.js";
 import { reconcileForegroundBusyState } from "../../../../src/app/services/run-control-service.js";
 

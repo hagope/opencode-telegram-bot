@@ -25,8 +25,8 @@ import {
   detachAttachedSession,
   markAttachedSessionBusy,
   markAttachedSessionIdle,
-} from "../../attach/service.js";
-import { externalUserInputSuppressionManager } from "../../external-input/suppression.js";
+} from "../../app/services/attach-service.js";
+import { externalUserInputSuppressionManager } from "../../app/managers/external-input-suppression-manager.js";
 
 /** Module-level references for async callbacks that don't have ctx. */
 let botInstance: Bot<Context> | null = null;

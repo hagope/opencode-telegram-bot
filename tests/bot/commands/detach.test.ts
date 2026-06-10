@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "grammy";
-import { detachCommand } from "../../../src/bot/commands/detach.js";
+import { detachCommand } from "../../../src/bot/commands/detach-command.js";
 import { t } from "../../../src/i18n/index.js";
 
 const mocked = vi.hoisted(() => ({
@@ -30,7 +30,7 @@ vi.mock("../../../src/app/services/session-service.js", () => ({
   clearSession: mocked.clearSessionMock,
 }));
 
-vi.mock("../../../src/attach/service.js", () => ({
+vi.mock("../../../src/app/services/attach-service.js", () => ({
   detachAttachedSession: mocked.detachAttachedSessionMock,
 }));
 

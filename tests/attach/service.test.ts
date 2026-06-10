@@ -4,8 +4,8 @@ import {
   attachToSession,
   detachAttachedSession,
   restoreAttachedCurrentSession,
-} from "../../src/attach/service.js";
-import { attachManager } from "../../src/attach/manager.js";
+} from "../../src/app/services/attach-service.js";
+import { attachManager } from "../../src/app/managers/attach-manager.js";
 import { questionManager } from "../../src/app/managers/question-manager.js";
 import { permissionManager } from "../../src/app/managers/permission-manager.js";
 

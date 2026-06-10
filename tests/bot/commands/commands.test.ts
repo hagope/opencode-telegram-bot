@@ -118,13 +118,13 @@ vi.mock("../../../src/utils/safe-background-task.js", () => ({
   }),
 }));
 
-vi.mock("../../../src/external-input/suppression.js", () => ({
+vi.mock("../../../src/app/managers/external-input-suppression-manager.js", () => ({
   externalUserInputSuppressionManager: {
     register: mocked.suppressionRegisterMock,
   },
 }));
 
-vi.mock("../../../src/attach/service.js", () => ({
+vi.mock("../../../src/app/services/attach-service.js", () => ({
   attachToSession: mocked.attachToSessionMock,
   detachAttachedSession: vi.fn(),
   markAttachedSessionBusy: vi.fn().mockResolvedValue(undefined),

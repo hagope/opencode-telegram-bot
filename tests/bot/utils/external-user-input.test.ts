@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildExternalUserInputNotification,
   deliverExternalUserInputNotification,
-} from "../../../src/bot/utils/external-user-input.js";
+} from "../../../src/app/services/external-user-input-service.js";
 
 const mocked = vi.hoisted(() => ({
   sendBotTextMock: vi.fn(),

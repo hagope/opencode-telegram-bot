@@ -4,8 +4,8 @@ import {
   type ForegroundBusySession,
 } from "../../scheduled-task/foreground-state.js";
 import { scheduledTaskRuntime } from "../../scheduled-task/runtime.js";
-import { attachManager } from "../../attach/manager.js";
-import { markAttachedSessionBusy, markAttachedSessionIdle } from "../../attach/service.js";
+import { attachManager } from "../managers/attach-manager.js";
+import { markAttachedSessionBusy, markAttachedSessionIdle } from "./attach-service.js";
 import { assistantRunState } from "../managers/assistant-run-state-manager.js";
 import { logger } from "../../utils/logger.js";
 

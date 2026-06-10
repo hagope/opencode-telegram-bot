@@ -24,8 +24,8 @@ import {
   detachAttachedSession,
   markAttachedSessionBusy,
   markAttachedSessionIdle,
-} from "../../attach/service.js";
-import { externalUserInputSuppressionManager } from "../../external-input/suppression.js";
+} from "../../app/services/attach-service.js";
+import { externalUserInputSuppressionManager } from "../../app/managers/external-input-suppression-manager.js";
 
 const COMMANDS_CALLBACK_PREFIX = "commands:";
 const COMMANDS_CALLBACK_SELECT_PREFIX = `${COMMANDS_CALLBACK_PREFIX}select:`;

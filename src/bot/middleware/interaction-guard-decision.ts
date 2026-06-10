@@ -9,7 +9,7 @@ import type {
   InteractionKind,
 } from "../../app/types/interaction.js";
 import { foregroundSessionState } from "../../scheduled-task/foreground-state.js";
-import { attachManager } from "../../attach/manager.js";
+import { attachManager } from "../../app/managers/attach-manager.js";
 
 const BUSY_ALLOWED_COMMANDS = ["/abort", "/detach", "/status", "/help"] as const;
 const BUSY_ALLOWED_COMMAND_SET = new Set<string>(BUSY_ALLOWED_COMMANDS);

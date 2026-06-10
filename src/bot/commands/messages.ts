@@ -8,7 +8,7 @@ import { getCurrentSession, setCurrentSession } from "../../app/services/session
 import type { SessionInfo } from "../../app/types/session.js";
 import { getCurrentProject } from "../../settings/manager.js";
 import { clearAllInteractionState } from "../../app/managers/interaction-manager.js";
-import { attachToSession } from "../../attach/service.js";
+import { attachToSession } from "../../app/services/attach-service.js";
 import { ingestSessionInfoForCache } from "../../app/services/session-cache-service.js";
 import { t } from "../../i18n/index.js";
 import { logger } from "../../utils/logger.js";

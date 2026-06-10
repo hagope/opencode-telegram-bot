@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { externalUserInputSuppressionManager } from "../../src/external-input/suppression.js";
+import { externalUserInputSuppressionManager } from "../../src/app/managers/external-input-suppression-manager.js";
 
 describe("external-input/suppression", () => {
   beforeEach(() => {

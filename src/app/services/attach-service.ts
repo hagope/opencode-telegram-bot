@@ -1,19 +1,19 @@
 import type { Bot, Context } from "grammy";
-import { opencodeClient } from "../opencode/client.js";
-import { isOpencodeServerHealthy } from "../opencode/ready-refresh.js";
-import { summaryAggregator } from "../summary/aggregator.js";
-import { pinnedMessageManager } from "../bot/pinned/pinned-message-manager.js";
-import { keyboardManager } from "../bot/keyboards/keyboard-manager.js";
-import { questionManager } from "../app/managers/question-manager.js";
-import { permissionManager } from "../app/managers/permission-manager.js";
-import { showCurrentQuestion } from "../bot/menus/question-menu.js";
-import { showPermissionRequest } from "../bot/menus/permission-menu.js";
-import type { SessionInfo } from "../app/types/session.js";
-import { getCurrentSession } from "../app/services/session-service.js";
-import { getCurrentProject } from "../settings/manager.js";
-import { attachManager } from "./manager.js";
-import { logger } from "../utils/logger.js";
-import { isExpectedOpencodeUnavailableError } from "../utils/opencode-error.js";
+import { opencodeClient } from "../../opencode/client.js";
+import { isOpencodeServerHealthy } from "../../opencode/ready-refresh.js";
+import { summaryAggregator } from "../../summary/aggregator.js";
+import { pinnedMessageManager } from "../../bot/pinned/pinned-message-manager.js";
+import { keyboardManager } from "../../bot/keyboards/keyboard-manager.js";
+import { questionManager } from "../managers/question-manager.js";
+import { permissionManager } from "../managers/permission-manager.js";
+import { showCurrentQuestion } from "../../bot/menus/question-menu.js";
+import { showPermissionRequest } from "../../bot/menus/permission-menu.js";
+import type { SessionInfo } from "../types/session.js";
+import { getCurrentSession } from "./session-service.js";
+import { getCurrentProject } from "../../settings/manager.js";
+import { attachManager } from "../managers/attach-manager.js";
+import { logger } from "../../utils/logger.js";
+import { isExpectedOpencodeUnavailableError } from "../../utils/opencode-error.js";
 
 interface EnsureAttachPinnedSessionParams {
   api: Context["api"];

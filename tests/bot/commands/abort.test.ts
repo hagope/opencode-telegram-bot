@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "grammy";
-import { abortCommand, abortCurrentOperation } from "../../../src/bot/commands/abort.js";
+import { abortCommand, abortCurrentOperation } from "../../../src/bot/commands/abort-command.js";
 import { clearAllInteractionState } from "../../../src/app/managers/interaction-manager.js";
 import { questionManager } from "../../../src/app/managers/question-manager.js";
 import { permissionManager } from "../../../src/app/managers/permission-manager.js";
@@ -43,7 +43,7 @@ vi.mock("../../../src/app/managers/assistant-run-state-manager.js", () => ({
   },
 }));
 
-vi.mock("../../../src/attach/service.js", () => ({
+vi.mock("../../../src/app/services/attach-service.js", () => ({
   markAttachedSessionIdle: mocked.markAttachedSessionIdleMock,
 }));
 

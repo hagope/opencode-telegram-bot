@@ -17,7 +17,7 @@ vi.mock("../../../../src/opencode/client.js", () => ({
   },
 }));
 
-vi.mock("../../../../src/attach/service.js", () => ({
+vi.mock("../../../../src/app/services/attach-service.js", () => ({
   markAttachedSessionBusy: mocked.markAttachedSessionBusyMock,
   markAttachedSessionIdle: mocked.markAttachedSessionIdleMock,
 }));
@@ -34,7 +34,7 @@ vi.mock("../../../../src/scheduled-task/runtime.js", () => ({
   },
 }));
 
-import { attachManager } from "../../../../src/attach/manager.js";
+import { attachManager } from "../../../../src/app/managers/attach-manager.js";
 import { foregroundSessionState } from "../../../../src/scheduled-task/foreground-state.js";
 import {
   __resetBusyReconciliationForTests,

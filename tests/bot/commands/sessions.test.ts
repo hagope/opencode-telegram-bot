@@ -94,7 +94,7 @@ vi.mock("../../../src/bot/pinned/pinned-message-manager.js", () => ({
   },
 }));
 
-vi.mock("../../../src/attach/service.js", () => ({
+vi.mock("../../../src/app/services/attach-service.js", () => ({
   attachToSession: mocked.attachToSessionMock,
 }));
 

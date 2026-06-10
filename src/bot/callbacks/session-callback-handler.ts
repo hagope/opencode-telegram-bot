@@ -13,7 +13,7 @@ import { logger } from "../../utils/logger.js";
 import { safeBackgroundTask } from "../../utils/safe-background-task.js";
 import { config } from "../../config.js";
 import { t } from "../../i18n/index.js";
-import { attachToSession } from "../../attach/service.js";
+import { attachToSession } from "../../app/services/attach-service.js";
 import { renderAssistantFinalPartsSafe } from "../render/assistant-rendering.js";
 import { sendRenderedBotPart } from "../ui/telegram-text.js";
 import {

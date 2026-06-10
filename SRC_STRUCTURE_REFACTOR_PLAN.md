@@ -439,7 +439,7 @@ src/bot/
   8. Обновить imports из projects/worktree/status/pinned/settings.
   9. Запустить session/rename/sessions/new тесты, затем build.
 
-- [ ] **Этап 15. Run control**
+- [x] **Этап 15. Run control**
 
   1. Перенести `bot/commands/abort.ts`, `detach.ts` -> `bot/commands/abort-command.ts`, `detach-command.ts`.
   2. Перенести `src/attach/*` -> `app/services/attach-service.ts` и, если есть state, `app/managers/*`.

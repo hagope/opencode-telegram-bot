@@ -8,10 +8,10 @@ import { keyboardManager } from "../keyboards/keyboard-manager.js";
 import { clearSession } from "../../app/services/session-service.js";
 import { clearProject } from "../../settings/manager.js";
 import { foregroundSessionState } from "../../scheduled-task/foreground-state.js";
-import { abortCurrentOperation } from "./abort.js";
+import { abortCurrentOperation } from "./abort-command.js";
 import { t } from "../../i18n/index.js";
 import { assistantRunState } from "../../app/managers/assistant-run-state-manager.js";
-import { detachAttachedSession } from "../../attach/service.js";
+import { detachAttachedSession } from "../../app/services/attach-service.js";
 
 export async function startCommand(ctx: Context): Promise<void> {
   if (ctx.chat) {

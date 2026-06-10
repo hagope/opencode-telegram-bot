@@ -28,8 +28,8 @@ import { worktreeCommand } from "./commands/worktree-command.js";
 import { handleWorktreeCallback } from "./callbacks/worktree-callback-handler.js";
 import { openCommand } from "./commands/open-command.js";
 import { lsCommand } from "./commands/ls-command.js";
-import { abortCommand } from "./commands/abort.js";
-import { detachCommand } from "./commands/detach.js";
+import { abortCommand } from "./commands/abort-command.js";
+import { detachCommand } from "./commands/detach-command.js";
 import { opencodeStartCommand } from "./commands/opencode-start.js";
 import { opencodeStopCommand } from "./commands/opencode-stop.js";
 import { renameCommand } from "./commands/rename-command.js";
@@ -117,23 +117,23 @@ import { assistantRunState } from "../app/managers/assistant-run-state-manager.j
 import { ResponseStreamer } from "./streaming/response-streamer.js";
 import type { StreamingMessagePayload } from "./streaming/response-streamer.js";
 import { ToolCallStreamer, type ToolStreamKey } from "./streaming/tool-call-streamer.js";
-import { attachManager } from "../attach/manager.js";
+import { attachManager } from "../app/managers/attach-manager.js";
 import {
   markAttachedSessionBusy,
   markAttachedSessionIdle,
   restoreAttachedCurrentSession,
-} from "../attach/service.js";
-import { externalUserInputSuppressionManager } from "../external-input/suppression.js";
+} from "../app/services/attach-service.js";
+import { externalUserInputSuppressionManager } from "../app/managers/external-input-suppression-manager.js";
 import {
   prepareAssistantFinalStreamingPayload,
   prepareAssistantStreamingPayload,
   renderAssistantFinalPartsSafe,
 } from "./render/assistant-rendering.js";
-import { deliverExternalUserInputNotification } from "./utils/external-user-input.js";
+import { deliverExternalUserInputNotification } from "../app/services/external-user-input-service.js";
 import {
   backgroundSessionTracker,
   type BackgroundSessionNotification,
-} from "../background-session/tracker.js";
+} from "../app/managers/background-session-manager.js";
 
 let botInstance: Bot<Context> | null = null;
 let chatIdInstance: number | null = null;

@@ -15,7 +15,7 @@ import { isForegroundBusy } from "../../app/services/run-control-service.js";
 import { replyBusyBlocked } from "../render/busy-blocked-renderer.js";
 import { logger } from "../../utils/logger.js";
 import { t } from "../../i18n/index.js";
-import { attachToSession } from "../../attach/service.js";
+import { attachToSession } from "../../app/services/attach-service.js";
 
 export interface NewCommandDeps {
   bot: Bot<Context>;

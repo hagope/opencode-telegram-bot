@@ -28,7 +28,7 @@ const mocked = vi.hoisted(() => ({
   keyboardClearContextMock: vi.fn(),
 }));
 
-vi.mock("../../../src/bot/commands/abort.js", () => ({
+vi.mock("../../../src/bot/commands/abort-command.js", () => ({
   abortCurrentOperation: mocked.abortCurrentOperationMock,
 }));
 
