@@ -246,6 +246,10 @@ export const config = {
     // "json" = base64 audio in an `input_audio` JSON body (e.g. OpenRouter).
     requestFormat: getOptionalSttRequestFormatEnvVar("STT_REQUEST_FORMAT", "multipart"),
   },
+  docExtractor: {
+    apiUrl: getEnvVar("DOC_EXTRACTOR_URL", false),
+    apiKey: getEnvVar("DOC_EXTRACTOR_API_KEY", false),
+  },
   tts: (() => {
     const provider = getOptionalTtsProviderEnvVar("TTS_PROVIDER", "openai");
     const defaultVoice =
