@@ -34,6 +34,22 @@ function getOptionalPositiveIntEnvVar(key: string, defaultValue: number): number
   return parsedValue;
 }
 
+// Like getOptionalPositiveIntEnvVar, but also accepts 0 (used to disable a feature).
+function getOptionalNonNegativeIntEnvVar(key: string, defaultValue: number): number {
+  const value = getEnvVar(key, false);
+
+  if (!value) {
+    return defaultValue;
+  }
+
+  const parsedValue = Number.parseInt(value, 10);
+  if (Number.isNaN(parsedValue) || parsedValue < 0) {
+    return defaultValue;
+  }
+
+  return parsedValue;
+}
+
 function getOptionalLocaleEnvVar(key: string, defaultValue: Locale): Locale {
   const value = getEnvVar(key, false);
   return normalizeLocale(value, defaultValue);
@@ -209,6 +225,9 @@ export const config = {
     locale: getOptionalLocaleEnvVar("BOT_LOCALE", "en"),
     trackBackgroundSessions: getOptionalBooleanEnvVar("TRACK_BACKGROUND_SESSIONS", true),
     messageFormatMode: getOptionalMessageFormatModeEnvVar("MESSAGE_FORMAT_MODE", "markdown"),
+    // Buffer near-limit text for this window so Telegram-split chunks can be merged.
+    // Short messages are processed immediately; 0 disables merging entirely.
+    messageMergeWindowMs: getOptionalNonNegativeIntEnvVar("MESSAGE_MERGE_WINDOW_MS", 1500),
     initialSettingsPreset: parseInitialSettingsPreset(),
   },
   files: {
