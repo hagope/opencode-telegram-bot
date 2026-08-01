@@ -1,7 +1,11 @@
 import { Event, ToolState } from "@opencode-ai/sdk/v2";
 import type { Bot } from "grammy";
 import type { CodeFileData } from "../formatters/summary-formatter.js";
-import { normalizePathForDisplay, prepareCodeFile } from "../formatters/summary-formatter.js";
+import {
+  normalizePathForDisplay,
+  prepareCodeFile,
+  prepareImageFile,
+} from "../formatters/summary-formatter.js";
 import type { Question } from "../types/question.js";
 import type { PermissionRequest } from "../types/permission.js";
 import type { FileChange } from "../types/summary.js";
@@ -163,6 +167,7 @@ type ClearedCallback = () => void;
 
 interface PreparedToolFileContext {
   fileData: CodeFileData | null;
+  extraFileData?: CodeFileData[];
   fileChange: FileChange | null;
 }
 
@@ -1379,6 +1384,7 @@ class SummaryAggregator {
             input,
             title,
             state.metadata as { [key: string]: unknown } | undefined,
+            typeof state.output === "string" ? state.output : undefined,
           );
 
           const toolData: ToolInfo = {
@@ -1402,14 +1408,20 @@ class SummaryAggregator {
           }
 
           if (preparedFileContext.fileData && this.onToolFileCallback) {
-            logger.debug(
-              `[Aggregator] Sending ${part.tool} file: ${preparedFileContext.fileData.filename} (${preparedFileContext.fileData.buffer.length} bytes)`,
-            );
-            this.onToolFileCallback({
-              ...toolData,
-              hasFileAttachment: true,
-              fileData: preparedFileContext.fileData,
-            });
+            const allFileData = [
+              preparedFileContext.fileData,
+              ...(preparedFileContext.extraFileData ?? []),
+            ];
+            for (const fileData of allFileData) {
+              logger.debug(
+                `[Aggregator] Sending ${part.tool} file: ${fileData.filename} (${fileData.buffer.length} bytes)`,
+              );
+              this.onToolFileCallback({
+                ...toolData,
+                hasFileAttachment: true,
+                fileData,
+              });
+            }
           }
 
           if (preparedFileContext.fileChange && this.onFileChangeCallback) {
@@ -1792,12 +1804,67 @@ class SummaryAggregator {
     return state.orderedPartIds.map((partID) => state.partTexts.get(partID) || "").join("");
   }
 
+  /**
+   * Generic convention for MCP tools that produce an image (e.g. chart
+   * generators): a completed tool call whose JSON `output` is
+   * `{ success: true, file_path: "...png" }` gets that image sent as a photo,
+   * regardless of the tool's name. Multi-page outputs may instead provide
+   * `file_paths: ["...png", ...]`, which is sent as a sequence of photos
+   * (`file_path` is ignored when `file_paths` is present, since by convention
+   * it duplicates the first entry).
+   */
+  private extractImageFilePathsFromOutput(output: string | undefined): string[] {
+    if (!output) {
+      return [];
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(output);
+    } catch {
+      return [];
+    }
+
+    if (typeof parsed !== "object" || parsed === null) {
+      return [];
+    }
+
+    const result = parsed as { [key: string]: unknown };
+    if (result.success === false) {
+      return [];
+    }
+
+    if (Array.isArray(result.file_paths)) {
+      return result.file_paths.filter((path): path is string => typeof path === "string");
+    }
+
+    return typeof result.file_path === "string" ? [result.file_path] : [];
+  }
+
   private prepareToolFileContext(
     tool: string,
     input: { [key: string]: unknown } | undefined,
     title: string | undefined,
     metadata: { [key: string]: unknown } | undefined,
+    output?: string,
   ): PreparedToolFileContext {
+    const imageFilePaths = this.extractImageFilePathsFromOutput(output);
+    if (imageFilePaths.length > 0) {
+      const pageCount = imageFilePaths.length;
+      const imageFiles = imageFilePaths
+        .map((imageFilePath, index) => {
+          const pageTitle =
+            pageCount > 1 ? `${title || ""} (${index + 1}/${pageCount})`.trim() : title || "";
+          return prepareImageFile(imageFilePath, pageTitle);
+        })
+        .filter((imageFile): imageFile is CodeFileData => imageFile !== null);
+      return {
+        fileData: imageFiles[0] ?? null,
+        extraFileData: imageFiles.slice(1),
+        fileChange: null,
+      };
+    }
+
     if (tool === "write" && input) {
       const filePath =
         typeof input.filePath === "string" ? normalizePathForDisplay(input.filePath) : "";

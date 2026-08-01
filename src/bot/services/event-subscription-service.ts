@@ -155,7 +155,7 @@ class EventSubscriptionService implements BotEventSubscriptionService {
 
         try {
           logger.debug(
-            `[Bot] Sending code file: ${fileData.filename} (${fileData.buffer.length} bytes, session=${sessionId})`,
+            `[Bot] Sending ${fileData.isImage ? "image" : "code"} file: ${fileData.filename} (${fileData.buffer.length} bytes, session=${sessionId})`,
           );
 
           await fs.mkdir(TEMP_DIR, { recursive: true });
@@ -163,15 +163,27 @@ class EventSubscriptionService implements BotEventSubscriptionService {
 
           const keyboard = this.getCurrentReplyKeyboard();
 
-          await this.botInstance.api.sendDocument(
-            this.chatIdInstance,
-            new InputFile(tempFilePath),
-            {
-              caption: fileData.caption,
-              disable_notification: true,
-              ...(keyboard ? { reply_markup: keyboard } : {}),
-            },
-          );
+          if (fileData.isImage) {
+            await this.botInstance.api.sendPhoto(
+              this.chatIdInstance,
+              new InputFile(tempFilePath),
+              {
+                caption: fileData.caption,
+                disable_notification: true,
+                ...(keyboard ? { reply_markup: keyboard } : {}),
+              },
+            );
+          } else {
+            await this.botInstance.api.sendDocument(
+              this.chatIdInstance,
+              new InputFile(tempFilePath),
+              {
+                caption: fileData.caption,
+                disable_notification: true,
+                ...(keyboard ? { reply_markup: keyboard } : {}),
+              },
+            );
+          }
         } finally {
           await fs.unlink(tempFilePath).catch(() => {});
         }

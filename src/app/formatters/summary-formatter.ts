@@ -1,4 +1,5 @@
 import type { ToolInfo } from "../managers/summary-aggregation-manager.js";
+import * as fs from "fs";
 import * as path from "path";
 import { config } from "../../config.js";
 import { logger } from "../../utils/logger.js";
@@ -310,6 +311,47 @@ export interface CodeFileData {
   buffer: Buffer;
   filename: string;
   caption: string;
+  isImage?: boolean;
+}
+
+const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp"]);
+const MAX_IMAGE_SIZE_MB = 10; // Telegram's sendPhoto limit
+
+/**
+ * Reads an image file off disk for delivery as a Telegram photo. Used for MCP
+ * tool results (e.g. chart-generation tools) that report a `file_path` instead
+ * of returning content inline.
+ */
+export function prepareImageFile(filePath: string, caption: string): CodeFileData | null {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!IMAGE_EXTENSIONS.has(ext)) {
+    return null;
+  }
+
+  let stat: fs.Stats;
+  try {
+    stat = fs.statSync(filePath);
+  } catch {
+    logger.debug(`[Formatter] Image file not found: ${filePath}`);
+    return null;
+  }
+
+  if (!stat.isFile()) {
+    return null;
+  }
+
+  const sizeMb = stat.size / (1024 * 1024);
+  if (sizeMb > MAX_IMAGE_SIZE_MB) {
+    logger.debug(
+      `[Formatter] Image too large: ${filePath} (${sizeMb.toFixed(2)} MB > ${MAX_IMAGE_SIZE_MB} MB)`,
+    );
+    return null;
+  }
+
+  const buffer = fs.readFileSync(filePath);
+  const filename = path.basename(filePath);
+
+  return { buffer, filename, caption, isImage: true };
 }
 
 function formatDiff(diff: string): string {
